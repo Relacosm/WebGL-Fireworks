@@ -1,4 +1,5 @@
 // File: public/fireworks.js
+alert("Click anywhere to launch fireworks!");
 class Firework {
     constructor(x, y, color) {
         this.position = { x, y };
