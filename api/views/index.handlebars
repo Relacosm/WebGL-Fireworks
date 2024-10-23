@@ -1,0 +1,39 @@
+// views/index.handlebars
+<canvas id="glCanvas"></canvas>
+
+<div class="info-overlay">
+    <h1>WebGL Fireworks</h1>
+    <p>Click anywhere to launch fireworks!</p>
+</div>
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+    attribute vec2 aVertexPosition;
+    attribute vec4 aColor;
+    attribute float aSize;
+    
+    uniform mat4 uModelViewMatrix;
+    uniform mat4 uProjectionMatrix;
+    
+    varying vec4 vColor;
+    
+    void main() {
+        gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aVertexPosition, 0.0, 1.0);
+        gl_PointSize = aSize;
+        vColor = aColor;
+    }
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+    precision mediump float;
+    varying vec4 vColor;
+    
+    void main() {
+        vec2 center = gl_PointCoord - vec2(0.5);
+        float dist = length(center);
+        float alpha = smoothstep(0.5, 0.3, dist);
+        gl_FragColor = vec4(vColor.rgb, vColor.a * alpha);
+    }
+</script>
+
+<script src="/js/mat4.js"></script>
+<script src="/js/fireworks.js"></script>
