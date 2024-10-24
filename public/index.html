@@ -10,76 +10,185 @@
             background: #000;
             color: rgb(255, 255, 255);
             text-align: center;
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
         }
+        
         canvas {
             display: block;
-            margin: 0 auto;
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100vw;
-            height: 80vh; /* Adjusted height */
-        }
-        h1 {
+            height: 100vh;
             z-index: 1;
-            position: relative;
-            font-size: 4rem; /* Adjust the font size as needed */
-            letter-spacing: 5px; /* Space between letters */
         }
+        
+        h1 {
+            position: relative;
+            z-index: 2;
+            font-size: 4.5rem;
+            letter-spacing: 8px;
+            font-family: 'Arial', sans-serif;
+            margin: 20px 0;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+            pointer-events: none;
+        }
+        
         .letter {
             display: inline-block;
-            transition: transform 0.5s;
+            transition: transform 0.5s, text-shadow 0.5s;
+            animation: glow 2s infinite;
+            position: relative;
+            cursor: pointer;
+            pointer-events: auto;
         }
+        
+        .letter:hover {
+            transform: translateY(-5px) scale(1.1);
+            text-shadow: 0 0 20px currentColor,
+                        0 0 40px currentColor,
+                        0 0 60px currentColor;
+        }
+        
         .container {
             display: inline-flex;
-            flex-direction: row; /* Default for larger screens */
+            flex-direction: row;
+            gap: 2px;
+            padding: 10px;
+            position: relative;
+            background: transparent;
         }
-        .line-break {
-            display: none; /* Hide the break on larger screens */
+
+        @keyframes glow {
+            0%, 100% {
+                text-shadow: 0 0 15px currentColor,
+                            0 0 30px currentColor;
+            }
+            50% {
+                text-shadow: 0 0 5px currentColor,
+                            0 0 15px currentColor;
+            }
         }
-        @media (max-width: 600px) { /* For mobile screens */
+
+        @keyframes flicker {
+            0%, 100% {
+                opacity: 1;
+                transform: translateY(-50%) scale(1);
+            }
+            50% {
+                opacity: 0.8;
+                transform: translateY(-50%) scale(0.95);
+            }
+        }
+
+        @media (max-width: 600px) {
             h1 {
-                font-size: 3rem; /* Adjust font size for mobile */
+                font-size: 3rem;
+                letter-spacing: 5px;
             }
-            .container {
-                flex-direction: column; /* Stack on mobile */
+            .container::before, .container::after {
+                font-size: 2rem;
             }
-            .line-break {
-                display: inline-block; /* Show break on mobile */
+            .container::before {
+                left: -40px;
+            }
+            .container::after {
+                right: -40px;
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -100% 0;
+            }
+            100% {
+                background-position: 100% 0;
+            }
+        }
+
+        .letter {
+            background: linear-gradient(
+                90deg, 
+                currentColor 0%, 
+                rgba(255, 255, 255, 0.8) 50%,
+                currentColor 100%
+            );
+            background-size: 200% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: wave 2s infinite ease-in-out, shimmer 3s infinite linear;
+            text-shadow: 0 0 15px currentColor;
+        }
+
+        @keyframes wave {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-15px);
             }
         }
     </style>
 </head>
 <body>
-    <h1 id="happyDiwali">
-        <span class="container"></span> <!-- Container for letters -->
-    </h1>
     <canvas id="fireworks"></canvas>
+    <h1 id="happyDiwali">
+        <span class="container"></span>
+    </h1>
     <script src="shaders.js"></script>
     <script src="fireworks.js"></script>
     <script>
-        const colors = ["red", "orange", "yellow", "green", "blue", "purple", "pink", "cyan", "magenta", "lime", "gold", "coral", "teal"];
+        const colors = [
+            "#FFD700", // Gold
+            "#FF6B6B", // Coral
+            "#4ECDC4", // Turquoise
+            "#FF69B4", // Hot Pink
+            "#9B59B6", // Purple
+            "#3498DB", // Blue
+            "#2ECC71", // Emerald
+            "#F1C40F", // Yellow
+            "#E74C3C", // Red
+            "#1ABC9C"  // Cyan
+        ];
+        
         const message = "Happy Diwali!";
         const container = document.querySelector(".container");
 
-        // Split the message into individual letters and create spans with colors
         message.split('').forEach((char, index) => {
             const span = document.createElement('span');
             span.classList.add('letter');
             span.textContent = char;
-            span.style.color = colors[index % colors.length]; // Cycle through colors
+            span.style.color = colors[index % colors.length];
+            
+            // Add slight delay to each letter's animation
+            span.style.animationDelay = `${index * 0.1}s`;
+            
+            // Add click effect
+            span.addEventListener('click', () => {
+                span.style.transform = 'scale(1.2) rotate(5deg)';
+                setTimeout(() => span.style.transform = '', 500);
+            });
+
             container.appendChild(span);
-
-            // Animate each letter to create a wavy effect
-            const waveAnimation = () => {
-                const offset = 15; // Adjust this value for wave height
-                const frequency = 0.6; // Increased frequency for faster wave speed
-                const phaseShift = index * 0.2; // Adjust phase shift for staggering
-                const time = performance.now() * 0.002; // Time based on current performance time
-                const wave = Math.sin(frequency * time + phaseShift) * offset;
-
-                span.style.transform = `translateY(${wave}px)`;
-                requestAnimationFrame(waveAnimation); // Loop the animation
-            };
-            waveAnimation(); // Start the animation
         });
+
+        // Add smooth wave animation
+        function updateWave() {
+            const letters = document.querySelectorAll('.letter');
+            const time = Date.now() * 0.002;
+            
+            letters.forEach((letter, index) => {
+                const offset = Math.sin(time + index * 0.3) * 15;
+                letter.style.transform = `translateY(${offset}px)`;
+            });
+            
+            requestAnimationFrame(updateWave);
+        }
+
+        updateWave();
     </script>
 </body>
 </html>
