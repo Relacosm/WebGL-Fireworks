@@ -27,19 +27,39 @@
             display: inline-block;
             transition: transform 0.5s;
         }
+        .container {
+            display: inline-flex;
+            flex-direction: row; /* Default for larger screens */
+        }
+        .line-break {
+            display: none; /* Hide the break on larger screens */
+        }
+        @media (max-width: 600px) { /* For mobile screens */
+            h1 {
+                font-size: 3rem; /* Adjust font size for mobile */
+            }
+            .container {
+                flex-direction: column; /* Stack on mobile */
+            }
+            .line-break {
+                display: inline-block; /* Show break on mobile */
+            }
+        }
     </style>
 </head>
 <body>
-    <h1 id="happyDiwali"></h1>
+    <h1 id="happyDiwali">
+        <span class="container"></span> <!-- Container for letters -->
+    </h1>
     <canvas id="fireworks"></canvas>
     <script src="shaders.js"></script>
     <script src="fireworks.js"></script>
     <script>
-        const message = "Happy Diwali!";
         const colors = ["red", "orange", "yellow", "green", "blue", "purple", "pink", "cyan", "magenta", "lime", "gold", "coral", "teal"];
-        const container = document.getElementById("happyDiwali");
+        const message = "Happy Diwali!";
+        const container = document.querySelector(".container");
 
-        // Split the message into individual letters and create spans
+        // Split the message into individual letters and create spans with colors
         message.split('').forEach((char, index) => {
             const span = document.createElement('span');
             span.classList.add('letter');
@@ -50,7 +70,7 @@
             // Animate each letter to create a wavy effect
             const waveAnimation = () => {
                 const offset = 15; // Adjust this value for wave height
-                const frequency = 2; // Increased frequency for faster wave speed
+                const frequency = 0.6; // Increased frequency for faster wave speed
                 const phaseShift = index * 0.2; // Adjust phase shift for staggering
                 const time = performance.now() * 0.002; // Time based on current performance time
                 const wave = Math.sin(frequency * time + phaseShift) * offset;
