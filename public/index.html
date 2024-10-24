@@ -7,20 +7,59 @@
     <style>
         body {
             margin: 0;
-            overflow: hidden;
             background: #000;
+            color: rgb(255, 255, 255);
+            text-align: center;
         }
         canvas {
             display: block;
+            margin: 0 auto;
+            width: 100vw;
+            height: 80vh; /* Adjusted height */
+        }
+        h1 {
+            z-index: 1;
+            position: relative;
+            font-size: 4rem; /* Adjust the font size as needed */
+            letter-spacing: 5px; /* Space between letters */
+        }
+        .letter {
+            display: inline-block;
+            transition: transform 0.5s;
         }
     </style>
 </head>
 <body>
-    <div>
-    <p>Click anywhere to launch fireworks!</p>
-    </div>
+    <h1 id="happyDiwali"></h1>
     <canvas id="fireworks"></canvas>
     <script src="shaders.js"></script>
     <script src="fireworks.js"></script>
+    <script>
+        const message = "Happy Diwali!";
+        const colors = ["red", "orange", "yellow", "green", "blue", "purple", "pink", "cyan", "magenta", "lime", "gold", "coral", "teal"];
+        const container = document.getElementById("happyDiwali");
+
+        // Split the message into individual letters and create spans
+        message.split('').forEach((char, index) => {
+            const span = document.createElement('span');
+            span.classList.add('letter');
+            span.textContent = char;
+            span.style.color = colors[index % colors.length]; // Cycle through colors
+            container.appendChild(span);
+
+            // Animate each letter to create a wavy effect
+            const waveAnimation = () => {
+                const offset = 15; // Adjust this value for wave height
+                const frequency = 2; // Increased frequency for faster wave speed
+                const phaseShift = index * 0.2; // Adjust phase shift for staggering
+                const time = performance.now() * 0.002; // Time based on current performance time
+                const wave = Math.sin(frequency * time + phaseShift) * offset;
+
+                span.style.transform = `translateY(${wave}px)`;
+                requestAnimationFrame(waveAnimation); // Loop the animation
+            };
+            waveAnimation(); // Start the animation
+        });
+    </script>
 </body>
 </html>
