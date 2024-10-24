@@ -13,7 +13,7 @@ class Firework {
         const particleCount = 50;
         for (let i = 0; i < particleCount; i++) {
             const angle = (Math.PI * 2 * i) / particleCount;
-            const speed = 2 + Math.random() * 2;
+            const speed = 1.4 + Math.random() * 2;
             this.particles.push({
                 x: this.position.x,
                 y: this.position.y,
