@@ -61,6 +61,11 @@
             background: transparent;
         }
 
+        .word-container {
+            display: inline-flex;
+            gap: 20px;
+        }
+        
         @keyframes glow {
             0%, 100% {
                 text-shadow: 0 0 15px currentColor,
@@ -96,6 +101,10 @@
             }
             .container::after {
                 right: -40px;
+            }
+            .word-container {
+                flex-direction: column;
+                gap: 10px;
             }
         }
 
@@ -136,7 +145,12 @@
 <body>
     <canvas id="fireworks"></canvas>
     <h1 id="happyDiwali">
-        <span class="container"></span>
+        <span class="container">
+            <span class="word-container">
+                <span class="word"></span>
+                <span class="word"></span>
+            </span>
+        </span>
     </h1>
     <script src="shaders.js"></script>
     <script src="fireworks.js"></script>
@@ -154,25 +168,27 @@
             "#1ABC9C"  // Cyan
         ];
         
-        const message = "Happy Diwali!";
-        const container = document.querySelector(".container");
+        const words = ["Happy", "Diwali!"];
+        const wordContainers = document.querySelectorAll('.word');
+        
+        words.forEach((word, wordIndex) => {
+            word.split('').forEach((char, charIndex) => {
+                const span = document.createElement('span');
+                span.classList.add('letter');
+                span.textContent = char;
+                span.style.color = colors[(wordIndex * word.length + charIndex) % colors.length];
+                
+                // Add slight delay to each letter's animation
+                span.style.animationDelay = `${(wordIndex * word.length + charIndex) * 0.1}s`;
+                
+                // Add click effect
+                span.addEventListener('click', () => {
+                    span.style.transform = 'scale(1.2) rotate(5deg)';
+                    setTimeout(() => span.style.transform = '', 500);
+                });
 
-        message.split('').forEach((char, index) => {
-            const span = document.createElement('span');
-            span.classList.add('letter');
-            span.textContent = char;
-            span.style.color = colors[index % colors.length];
-            
-            // Add slight delay to each letter's animation
-            span.style.animationDelay = `${index * 0.1}s`;
-            
-            // Add click effect
-            span.addEventListener('click', () => {
-                span.style.transform = 'scale(1.2) rotate(5deg)';
-                setTimeout(() => span.style.transform = '', 500);
+                wordContainers[wordIndex].appendChild(span);
             });
-
-            container.appendChild(span);
         });
 
         // Add smooth wave animation
